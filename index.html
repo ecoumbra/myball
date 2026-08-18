@@ -5,14 +5,12 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
   >
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="theme-color" content="#1c1c1e">
 
-  <title>Vibratissimo BLE Diagnostic</title>
+  <title>Vibratissimo Single Ball Controller</title>
 
   <style>
     * {
@@ -21,35 +19,30 @@
     }
 
     body {
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "SF Pro Text",
-        Arial,
-        sans-serif;
+      margin: 0;
+      padding: 16px 14px 25px;
 
       background: #1c1c1e;
       color: #ffffff;
 
-      margin: 0;
-      padding:
-        calc(12px + env(safe-area-inset-top))
-        14px
-        calc(18px + env(safe-area-inset-bottom));
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Arial,
+        sans-serif;
 
       text-align: center;
     }
 
     .container {
       max-width: 520px;
-      margin: 0 auto;
+      margin: auto;
     }
 
-    h1 {
-      font-size: 24px;
+    h2 {
       margin: 8px 0 3px;
-      font-weight: 700;
+      font-size: 23px;
     }
 
     .subtitle {
@@ -59,82 +52,75 @@
     }
 
     #status {
-      background: #2c2c2e;
-      border-radius: 12px;
-      padding: 13px 10px;
-      margin-bottom: 12px;
+      padding: 12px;
+      margin: 10px 0;
 
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 10px;
 
-      transition: background 0.2s;
-    }
-
-    .status-disconnected {
-      background: #3a2020 !important;
+      background: #3a2020;
       color: #ff6961;
+
+      font-weight: 700;
+      font-size: 14px;
     }
 
-    .status-searching {
-      background: #3a301c !important;
-      color: #ffcc00;
-    }
-
-    .status-connected {
+    .connected {
       background: #193b25 !important;
-      color: #30d158;
+      color: #30d158 !important;
     }
 
-    .status-error {
+    .searching {
+      background: #3a301c !important;
+      color: #ffcc00 !important;
+    }
+
+    .error {
       background: #3a2020 !important;
-      color: #ff453a;
+      color: #ff453a !important;
     }
 
     .panel {
       background: #2c2c2e;
       border-radius: 14px;
+
       padding: 14px;
       margin: 10px 0;
     }
 
     .panel-title {
-      font-size: 13px;
-      font-weight: 700;
       color: #8e8e93;
+
+      font-size: 12px;
+      font-weight: 700;
+
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: .5px;
+
       margin-bottom: 10px;
     }
 
     button {
       width: 100%;
+
       min-height: 52px;
 
-      border: none;
-      border-radius: 12px;
+      border: 0;
+      border-radius: 11px;
 
-      padding: 13px 10px;
       margin: 5px 0;
+      padding: 13px;
+
+      color: white;
 
       font-size: 16px;
       font-weight: 700;
 
-      color: white;
-
       touch-action: manipulation;
-      -webkit-user-select: none;
-      user-select: none;
-
-      cursor: pointer;
     }
 
     button:active {
-      transform: scale(0.98);
-      opacity: 0.8;
-    }
-
-    button:disabled {
-      opacity: 0.35;
+      transform: scale(.98);
+      opacity: .8;
     }
 
     .green {
@@ -161,60 +147,46 @@
       background: #48484a;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .grid button {
-      margin: 0;
-    }
-
-    /* POWER */
-
     .power-value {
       font-size: 38px;
       font-weight: 800;
-      margin: 3px 0 12px;
-    }
 
-    .power-percent {
+      margin: 4px 0 2px;
+
       color: #ff9f0a;
     }
 
-    .power-raw {
-      font-family: monospace;
+    .raw {
       color: #8e8e93;
+
+      font-family: monospace;
       font-size: 13px;
-      margin-top: -5px;
-      margin-bottom: 12px;
+
+      margin-bottom: 10px;
     }
 
     input[type="range"] {
       width: 100%;
-      height: 42px;
-
-      margin: 4px 0 10px;
+      height: 44px;
 
       accent-color: #ff9500;
-      cursor: pointer;
+
+      margin: 4px 0 6px;
     }
 
     .range-labels {
       display: flex;
       justify-content: space-between;
-      color: #8e8e93;
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
 
-    /* DEVICE INFO */
+      color: #8e8e93;
+      font-size: 11px;
+
+      margin-bottom: 10px;
+    }
 
     .info-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
 
       padding: 7px 0;
 
@@ -224,168 +196,140 @@
     }
 
     .info-row:last-child {
-      border-bottom: none;
+      border-bottom: 0;
     }
 
-    .info-label {
+    .label {
       color: #8e8e93;
     }
 
-    .info-value {
+    .value {
       font-family: monospace;
-      color: #ffffff;
       max-width: 65%;
       overflow-wrap: anywhere;
     }
 
-    /* LOG */
-
     #log {
-      text-align: left;
-
       background: #000000;
       color: #00ff66;
 
-      border-radius: 10px;
+      text-align: left;
+
+      border-radius: 9px;
 
       padding: 10px;
-
-      font-family:
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
-
-      font-size: 11px;
-      line-height: 1.45;
 
       min-height: 150px;
       max-height: 300px;
 
       overflow-y: auto;
 
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+
+      font-size: 11px;
+      line-height: 1.45;
+
       white-space: pre-wrap;
       word-break: break-word;
     }
 
-    .log-buttons {
+    .two {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
 
-      margin-top: 8px;
+      grid-template-columns: 1fr 1fr;
+
+      gap: 8px;
     }
 
-    .log-buttons button {
+    .two button {
+      margin: 0;
       min-height: 42px;
       font-size: 13px;
-      margin: 0;
     }
 
     .footer {
       color: #636366;
       font-size: 11px;
       margin-top: 15px;
-      line-height: 1.4;
-    }
-
-    @media (max-width: 360px) {
-      h1 {
-        font-size: 21px;
-      }
-
-      button {
-        font-size: 15px;
-      }
-
-      .power-value {
-        font-size: 34px;
-      }
     }
   </style>
 </head>
+
 
 <body>
 
 <div class="container">
 
-  <h1>Vibratissimo BLE</h1>
-  <div class="subtitle">Diagnostic & Motor Control</div>
+  <h2>Vibratissimo Single Ball</h2>
 
-  <div id="status" class="status-disconnected">
+  <div class="subtitle">
+    BLE Motor Controller
+  </div>
+
+
+  <div id="status">
     НЕ ПІДКЛЮЧЕНО
   </div>
+
 
   <!-- CONNECTION -->
 
   <div class="panel">
 
-    <div class="panel-title">Підключення</div>
+    <div class="panel-title">
+      Підключення
+    </div>
 
     <button
-      id="connectButton"
       class="green"
-      onclick="connect()"
+      onclick="connectBLE()"
     >
-      1. ПІДКЛЮЧИТИ КУЛЬКУ
+      ПІДКЛЮЧИТИСЯ ДО BALL
     </button>
 
     <button
-      id="modeButton"
       class="blue"
-      onclick="sendMode()"
-      
+      onclick="sendMotorMode()"
     >
-      2. MOTOR MODE1 — 03 00
+      УВІМКНУТИ MOTOR MODE
     </button>
 
     <button
       class="gray"
-      onclick="disconnect()"
+      onclick="disconnectBLE()"
     >
-      ВІДКЛЮЧИТИ
+      ВІДКЛЮЧИТИСЯ
     </button>
 
   </div>
 
-  <!-- DEVICE -->
-
-  <div class="panel">
-
-    <div class="panel-title">BLE пристрій</div>
-
-    <div class="info-row">
-      <span class="info-label">Назва</span>
-      <span id="deviceName" class="info-value">—</span>
-    </div>
-
-    <div class="info-row">
-      <span class="info-label">ID</span>
-      <span id="deviceId" class="info-value">—</span>
-    </div>
-
-    <div class="info-row">
-      <span class="info-label">GATT</span>
-      <span id="gattState" class="info-value">Disconnected</span>
-    </div>
-
-  </div>
 
   <!-- POWER -->
 
   <div class="panel">
 
-    <div class="panel-title">Потужність моторчика</div>
-
-    <div class="power-value">
-      <span id="powerValue" class="power-percent">0%</span>
+    <div class="panel-title">
+      Потужність
     </div>
 
-    <div id="rawValue" class="power-raw">
+    <div
+      id="powerValue"
+      class="power-value"
+    >
+      0%
+    </div>
+
+    <div
+      id="rawValue"
+      class="raw"
+    >
       RAW: 0 — HEX: 00
     </div>
+
 
     <input
       id="powerSlider"
@@ -394,8 +338,9 @@
       max="100"
       value="0"
       step="1"
-      oninput="sliderChanged(this.value)"
+      oninput="powerChanged(this.value)"
     >
+
 
     <div class="range-labels">
       <span>0%</span>
@@ -405,7 +350,8 @@
       <span>100%</span>
     </div>
 
-    <div class="grid">
+
+    <div class="two">
 
       <button
         class="orange"
@@ -437,57 +383,86 @@
 
     </div>
 
+
     <button
       class="red"
       onclick="stopMotor()"
     >
-      STOP — 00 00
+      STOP
     </button>
 
   </div>
+
 
   <!-- DIAGNOSTICS -->
 
   <div class="panel">
 
-    <div class="panel-title">BLE діагностика</div>
-
-    <div class="info-row">
-      <span class="info-label">Service</span>
-      <span class="info-value">1523</span>
+    <div class="panel-title">
+      BLE діагностика
     </div>
 
     <div class="info-row">
-      <span class="info-label">Mode characteristic</span>
-      <span class="info-value">1524</span>
+      <span class="label">Service</span>
+      <span class="value">1523</span>
     </div>
 
     <div class="info-row">
-      <span class="info-label">Motor characteristic</span>
-      <span class="info-value">1526</span>
+      <span class="label">Mode characteristic</span>
+      <span class="value">1524</span>
     </div>
 
     <div class="info-row">
-      <span class="info-label">Остання потужність</span>
-      <span id="lastPower" class="info-value">—</span>
+      <span class="label">Motor characteristic</span>
+      <span class="value">1526</span>
     </div>
 
     <div class="info-row">
-      <span class="info-label">Остання команда</span>
-      <span id="lastCommand" class="info-value">—</span>
+      <span class="label">Режим</span>
+      <span
+        id="modeState"
+        class="value"
+      >
+        —
+      </span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Потужність</span>
+      <span
+        id="lastPower"
+        class="value"
+      >
+        —
+      </span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Остання команда</span>
+      <span
+        id="lastCommand"
+        class="value"
+      >
+        —
+      </span>
     </div>
 
   </div>
+
 
   <!-- LOG -->
 
   <div class="panel">
 
-    <div class="panel-title">BLE Console</div>
+    <div class="panel-title">
+      BLE Console
+    </div>
 
-    <div id="log">Console ready...</div>
+    <div id="log">
+      Console ready...
+    </div>
 
-    <div class="log-buttons">
+    <div class="two">
 
       <button
         class="dark"
@@ -507,9 +482,9 @@
 
   </div>
 
+
   <div class="footer">
-    Vibratissimo BLE Diagnostic<br>
-    Web Bluetooth / GATT
+    Vibratissimo Single Ball Controller
   </div>
 
 </div>
@@ -518,7 +493,7 @@
 <script>
 
 /* ============================================================
-   BLE CONFIGURATION
+   BLE UUID
    ============================================================ */
 
 const SERVICE_UUID =
@@ -532,35 +507,31 @@ const MOTOR_UUID =
 
 
 /* ============================================================
-   GLOBAL STATE
+   STATE
    ============================================================ */
 
 let device = null;
+
 let server = null;
+
 let service = null;
 
 let modeChar = null;
+
 let motorChar = null;
+
+let powerLoop = null;
+
+let modeLoop = null;
 
 let currentPower = 0;
 
 
 /* ============================================================
-   DOM HELPERS
-   ============================================================ */
-
-function $(id) {
-  return document.getElementById(id);
-}
-
-
-/* ============================================================
-   LOGGING
+   HELPERS
    ============================================================ */
 
 function log(message) {
-
-  const el = $("log");
 
   const now = new Date();
 
@@ -574,173 +545,106 @@ function log(message) {
       }
     );
 
+  const el =
+    document.getElementById("log");
+
   el.textContent =
     `[${time}] ${message}\n` +
     el.textContent;
 }
 
 
-function clearLog() {
+function hexByte(value) {
 
-  $("log").textContent =
-    "Console cleared...";
-}
-
-
-async function copyLog() {
-
-  try {
-
-    await navigator.clipboard.writeText(
-      $("log").textContent
-    );
-
-    log("LOG copied to clipboard");
-
-  } catch (err) {
-
-    log(
-      "Clipboard error: " +
-      err.message
-    );
-  }
-}
-
-
-/* ============================================================
-   STATUS
-   ============================================================ */
-
-function updateStatus(
-  text,
-  type = "disconnected"
-) {
-
-  const el = $("status");
-
-  el.textContent = text;
-
-  el.className = "";
-
-  el.classList.add(
-    type === "connected"
-      ? "status-connected"
-      : type === "searching"
-      ? "status-searching"
-      : type === "error"
-      ? "status-error"
-      : "status-disconnected"
-  );
-}
-
-
-/* ============================================================
-   BUTTON STATE
-   ============================================================ */
-
-function updateButtons() {
-
-  const connected =
-    !!(
-      device &&
-      device.gatt &&
-      device.gatt.connected
-    );
-
-  $("modeButton").disabled =
-    !connected || !modeChar;
-
-}
-
-
-/* ============================================================
-   HEX
-   ============================================================ */
-
-function byteToHex(value) {
-
-  return value
+  return Number(value)
     .toString(16)
     .padStart(2, "0")
     .toUpperCase();
 }
 
 
-function bytesToHex(bytes) {
+function setStatus(
+  text,
+  type
+) {
 
-  return Array
-    .from(bytes)
-    .map(byteToHex)
-    .join(" ");
+  const el =
+    document.getElementById("status");
+
+  el.textContent =
+    text;
+
+  el.className =
+    type || "";
 }
 
 
 /* ============================================================
-   WRITE BLE
+   BLE WRITE
+   IMPORTANT:
+   Use writeValue(), as in the old working controller.
    ============================================================ */
 
-async function writeBytes(
+async function writeCommand(
   characteristic,
   bytes,
-  charName
+  name
 ) {
 
   if (!characteristic) {
 
     log(
-      `ERROR: ${charName} characteristic not ready`
+      `ERROR: ${name} characteristic unavailable`
     );
 
     return false;
   }
 
+
   const data =
     new Uint8Array(bytes);
 
+
   const hex =
-    bytesToHex(data);
+    Array
+      .from(data)
+      .map(hexByte)
+      .join(" ");
+
 
   try {
 
     /*
-      Prefer Write Without Response.
-      This corresponds to the behaviour
-      that worked in the previous version.
+      Deliberately use writeValue(),
+      NOT writeValueWithoutResponse().
     */
 
-    if (
-      typeof characteristic.writeValueWithoutResponse ===
-      "function"
-    ) {
+    await characteristic.writeValue(
+      data
+    );
 
-      await characteristic.writeValueWithoutResponse(
-        data
-      );
 
-      log(
-        `TX NoResp ${charName}: [${hex}]`
-      );
+    log(
+      `TX ${name}: [${hex}]`
+    );
 
-    } else {
 
-      await characteristic.writeValue(
-        data
-      );
+    document.getElementById(
+      "lastCommand"
+    ).textContent =
+      `${name}: ${hex}`;
 
-      log(
-        `TX WithResp ${charName}: [${hex}]`
-      );
-    }
-
-    $("lastCommand").textContent =
-      `${charName}: ${hex}`;
 
     return true;
 
   } catch (err) {
 
     log(
-      `TX FAIL ${charName}: ${err.message}`
+      `TX FAIL ${name}: ${
+        err && err.message
+          ? err.message
+          : String(err)
+      }`
     );
 
     return false;
@@ -752,43 +656,30 @@ async function writeBytes(
    CONNECT
    ============================================================ */
 
-async function connect() {
-
-  if (
-    !navigator.bluetooth
-  ) {
-
-    updateStatus(
-      "WEB BLUETOOTH НЕ ПІДТРИМУЄТЬСЯ",
-      "error"
-    );
-
-    log(
-      "ERROR: navigator.bluetooth unavailable"
-    );
-
-    return;
-  }
+async function connectBLE() {
 
   try {
 
-    updateStatus(
-      "ПОШУК BLE ПРИСТРОЮ...",
+    stopAllLoops();
+
+
+    setStatus(
+      "ПОШУК BALL...",
       "searching"
     );
+
 
     log(
       "Requesting BLE Device..."
     );
+
 
     device =
       await navigator.bluetooth.requestDevice({
 
         filters: [
           {
-            services: [
-              SERVICE_UUID
-            ]
+            name: "Ball"
           }
         ],
 
@@ -806,32 +697,14 @@ async function connect() {
     );
 
 
-    $("deviceName").textContent =
-      device.name || "Unnamed";
-
-
-    $("deviceId").textContent =
-      device.id || "—";
-
-
     device.addEventListener(
       "gattserverdisconnected",
       onDisconnected
     );
 
 
-    updateStatus(
-      "ПІДКЛЮЧЕННЯ...",
-      "searching"
-    );
-
-
     server =
       await device.gatt.connect();
-
-
-    $("gattState").textContent =
-      "Connected";
 
 
     log(
@@ -872,15 +745,12 @@ async function connect() {
     );
 
 
-    updateStatus(
+    setStatus(
       `ПІДКЛЮЧЕНО: ${
-        device.name || "Device"
+        device.name || "BALL"
       }`,
       "connected"
     );
-
-
-    updateButtons();
 
 
     log(
@@ -890,19 +760,19 @@ async function connect() {
 
   } catch (err) {
 
-    updateStatus(
+    setStatus(
       "ПОМИЛКА ПІДКЛЮЧЕННЯ",
       "error"
     );
 
-    $("gattState").textContent =
-      "Error";
 
     log(
-      `ERROR: ${err.message}`
+      `ERROR: ${
+        err && err.message
+          ? err.message
+          : String(err)
+      }`
     );
-
-    updateButtons();
   }
 }
 
@@ -911,12 +781,12 @@ async function connect() {
    MOTOR MODE
    ============================================================ */
 
-async function sendMode() {
+async function sendMotorMode() {
 
   if (!modeChar) {
 
     log(
-      "ERROR: Mode characteristic unavailable"
+      "ERROR: Connect to BALL first"
     );
 
     return;
@@ -924,27 +794,121 @@ async function sendMode() {
 
 
   log(
-    "Sending Motor Mode init: 03 00"
+    "Sending Motor Mode: 03 00"
   );
 
 
-  await writeBytes(
+  /*
+    First command immediately.
+  */
+
+  await writeCommand(
     modeChar,
-    [0x03, 0x00],
+    [
+      0x03,
+      0x00
+    ],
     "1524"
+  );
+
+
+  /*
+    Keep Motor Mode alive.
+    Same principle as the old working page:
+    repeat every 300 ms.
+  */
+
+  if (modeLoop) {
+
+    clearInterval(
+      modeLoop
+    );
+  }
+
+
+  modeLoop =
+    setInterval(
+      async function() {
+
+        if (
+          modeChar &&
+          device &&
+          device.gatt &&
+          device.gatt.connected
+        ) {
+
+          await writeCommand(
+            modeChar,
+            [
+              0x03,
+              0x00
+            ],
+            "1524"
+          );
+
+        }
+
+      },
+      300
+    );
+
+
+  document.getElementById(
+    "modeState"
+  ).textContent =
+    "MOTOR MODE: ON";
+
+
+  log(
+    "Motor Mode keep-alive: 300 ms"
   );
 }
 
 
 /* ============================================================
-   POWER CONVERSION
+   POWER CALCULATION
    ============================================================ */
 
-function percentToRaw(percent) {
+function percentToRaw(
+  percent
+) {
 
   return Math.round(
-    (percent * 255) / 100
+    Number(percent) * 255 / 100
   );
+}
+
+
+/* ============================================================
+   POWER DISPLAY
+   ============================================================ */
+
+function updatePowerDisplay(
+  percent
+) {
+
+  const raw =
+    percentToRaw(
+      percent
+    );
+
+
+  document.getElementById(
+    "powerValue"
+  ).textContent =
+    `${percent}%`;
+
+
+  document.getElementById(
+    "rawValue"
+  ).textContent =
+    `RAW: ${raw} — HEX: ${hexByte(raw)}`;
+
+
+  document.getElementById(
+    "powerSlider"
+  ).value =
+    percent;
 }
 
 
@@ -952,114 +916,132 @@ function percentToRaw(percent) {
    SLIDER
    ============================================================ */
 
-function sliderChanged(value) {
+function powerChanged(
+  value
+) {
 
   const percent =
-    parseInt(value, 10);
+    Number(value);
+
 
   currentPower =
     percent;
 
+
   updatePowerDisplay(
     percent
   );
-}
 
 
-function updatePowerDisplay(
-  percent
-) {
+  /*
+    Stop previous power stream.
+  */
 
-  const raw =
-    percentToRaw(percent);
+  if (powerLoop) {
 
-  const hex =
-    byteToHex(raw);
+    clearInterval(
+      powerLoop
+    );
 
-
-  $("powerValue").textContent =
-    `${percent}%`;
-
-
-  $("rawValue").textContent =
-    `RAW: ${raw} — HEX: ${hex}`;
+    powerLoop = null;
+  }
 
 
-  $("powerSlider").value =
-    percent;
-}
+  /*
+    0% means stop sending power commands.
+  */
 
+  if (percent <= 0) {
 
-/* ============================================================
-   SET POWER
-   ============================================================ */
+    return;
+  }
 
-async function setPower(
-  percent
-) {
 
   if (!motorChar) {
 
     log(
-      "ERROR: Motor characteristic unavailable"
+      "Slider moved before connection"
     );
 
     return;
   }
 
 
-  percent =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        Number(percent)
-      )
-    );
-
-
-  currentPower =
-    percent;
-
-
-  updatePowerDisplay(
-    percent
-  );
-
-
-  const rawValue =
+  const raw =
     percentToRaw(
       percent
     );
 
 
-  const hex =
-    byteToHex(
-      rawValue
-    );
+  /*
+    Send immediately.
+  */
 
-
-  log(
-    `Setting Power ${percent}% → [${hex} 00]`
+  writeCommand(
+    motorChar,
+    [
+      raw,
+      0x00
+    ],
+    "1526"
   );
 
 
-  const success =
-    await writeBytes(
-      motorChar,
-      [
-        rawValue,
-        0x00
-      ],
-      "1526"
+  /*
+    Repeat every 300 ms.
+  */
+
+  powerLoop =
+    setInterval(
+      async function() {
+
+        if (
+          motorChar &&
+          device &&
+          device.gatt &&
+          device.gatt.connected
+        ) {
+
+          await writeCommand(
+            motorChar,
+            [
+              raw,
+              0x00
+            ],
+            "1526"
+          );
+
+        }
+
+      },
+      300
     );
 
 
-  if (success) {
+  document.getElementById(
+    "lastPower"
+  ).textContent =
+    `${percent}% (${hexByte(raw)} 00)`;
+}
 
-    $("lastPower").textContent =
-      `${percent}% (${hex} 00)`;
-  }
+
+/* ============================================================
+   PRESET POWER
+   ============================================================ */
+
+function setPower(
+  percent
+) {
+
+  document.getElementById(
+    "powerSlider"
+  ).value =
+    percent;
+
+
+  powerChanged(
+    percent
+  );
 }
 
 
@@ -1070,22 +1052,23 @@ async function setPower(
 async function stopMotor() {
 
   log(
-    "Sending STOP command: 00 00"
+    "STOP requested"
   );
 
 
-  if (!motorChar) {
+  if (powerLoop) {
 
-    log(
-      "ERROR: Motor characteristic unavailable"
+    clearInterval(
+      powerLoop
     );
 
-    return;
+    powerLoop = null;
   }
 
 
-  const success =
-    await writeBytes(
+  if (motorChar) {
+
+    await writeCommand(
       motorChar,
       [
         0x00,
@@ -1093,18 +1076,48 @@ async function stopMotor() {
       ],
       "1526"
     );
+  }
 
 
-  if (success) {
+  currentPower =
+    0;
 
-    currentPower = 0;
 
-    updatePowerDisplay(
-      0
+  updatePowerDisplay(
+    0
+  );
+
+
+  document.getElementById(
+    "lastPower"
+  ).textContent =
+    "STOP (00 00)";
+}
+
+
+/* ============================================================
+   STOP ALL LOOPS
+   ============================================================ */
+
+function stopAllLoops() {
+
+  if (powerLoop) {
+
+    clearInterval(
+      powerLoop
     );
 
-    $("lastPower").textContent =
-      "STOP (00 00)";
+    powerLoop = null;
+  }
+
+
+  if (modeLoop) {
+
+    clearInterval(
+      modeLoop
+    );
+
+    modeLoop = null;
   }
 }
 
@@ -1113,9 +1126,30 @@ async function stopMotor() {
    DISCONNECT
    ============================================================ */
 
-async function disconnect() {
+async function disconnectBLE() {
+
+  stopAllLoops();
+
 
   try {
+
+    if (
+      motorChar &&
+      device &&
+      device.gatt &&
+      device.gatt.connected
+    ) {
+
+      await writeCommand(
+        motorChar,
+        [
+          0x00,
+          0x00
+        ],
+        "1526"
+      );
+    }
+
 
     if (
       device &&
@@ -1123,69 +1157,92 @@ async function disconnect() {
       device.gatt.connected
     ) {
 
-      log(
-        "Sending STOP before disconnect..."
-      );
-
-      if (motorChar) {
-
-        await writeBytes(
-          motorChar,
-          [
-            0x00,
-            0x00
-          ],
-          "1526"
-        );
-      }
-
-
       device.gatt.disconnect();
-
-    } else {
-
-      log(
-        "No active GATT connection"
-      );
     }
+
 
   } catch (err) {
 
     log(
-      `Disconnect error: ${err.message}`
+      `Disconnect error: ${
+        err && err.message
+          ? err.message
+          : String(err)
+      }`
     );
   }
 }
 
 
 /* ============================================================
-   DISCONNECTED EVENT
+   DISCONNECTED
    ============================================================ */
 
 function onDisconnected() {
 
-  updateStatus(
+  stopAllLoops();
+
+
+  modeChar = null;
+
+  motorChar = null;
+
+  server = null;
+
+  service = null;
+
+
+  setStatus(
     "ВІДКЛЮЧЕНО",
-    "disconnected"
+    ""
   );
 
 
-  $("gattState").textContent =
-    "Disconnected";
+  document.getElementById(
+    "modeState"
+  ).textContent =
+    "—";
 
 
   log(
     "Device disconnected"
   );
+}
 
 
-  modeChar = null;
-  motorChar = null;
-  server = null;
-  service = null;
+/* ============================================================
+   LOG CONTROLS
+   ============================================================ */
+
+function clearLog() {
+
+  document.getElementById(
+    "log"
+  ).textContent =
+    "Console cleared...";
+}
 
 
-  updateButtons();
+async function copyLog() {
+
+  try {
+
+    await navigator.clipboard.writeText(
+      document.getElementById(
+        "log"
+      ).textContent
+    );
+
+    log(
+      "LOG copied to clipboard"
+    );
+
+  } catch (err) {
+
+    log(
+      "Clipboard error"
+    );
+  }
 }
 
 
@@ -1193,23 +1250,21 @@ function onDisconnected() {
    INITIALIZATION
    ============================================================ */
 
-updatePowerDisplay(
-  0
-);
-
-updateButtons();
+updatePowerDisplay(0);
 
 
-if (!navigator.bluetooth) {
+if (
+  navigator.bluetooth
+) {
 
   log(
-    "WARNING: Web Bluetooth API unavailable"
+    "Web Bluetooth API available"
   );
 
 } else {
 
   log(
-    "Web Bluetooth API available"
+    "ERROR: Web Bluetooth unavailable"
   );
 }
 
