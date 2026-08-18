@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="theme-color" content="#1c1c1e">
+
+  <title>Vibratissimo BLE Diagnostic</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Arial,
+        sans-serif;
+
+      background: #1c1c1e;
+      color: #ffffff;
+
+      margin: 0;
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        14px
+        calc(18px + env(safe-area-inset-bottom));
+
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 8px 0 3px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #8e8e93;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+
+    #status {
+      background: #2c2c2e;
+      border-radius: 12px;
+      padding: 13px 10px;
+      margin-bottom: 12px;
+
+      font-size: 14px;
+      font-weight: 700;
+
+      transition: background 0.2s;
+    }
+
+    .status-disconnected {
+      background: #3a2020 !important;
+      color: #ff6961;
+    }
+
+    .status-searching {
+      background: #3a301c !important;
+      color: #ffcc00;
+    }
+
+    .status-connected {
+      background: #193b25 !important;
+      color: #30d158;
+    }
+
+    .status-error {
+      background: #3a2020 !important;
+      color: #ff453a;
+    }
+
+    .panel {
+      background: #2c2c2e;
+      border-radius: 14px;
+      padding: 14px;
+      margin: 10px 0;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #8e8e93;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      min-height: 52px;
+
+      border: none;
+      border-radius: 12px;
+
+      padding: 13px 10px;
+      margin: 5px 0;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      color: white;
+
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+      opacity: 0.8;
+    }
+
+    button:disabled {
+      opacity: 0.35;
+    }
+
+    .green {
+      background: #34c759;
+    }
+
+    .blue {
+      background: #0a84ff;
+    }
+
+    .orange {
+      background: #ff9500;
+    }
+
+    .red {
+      background: #ff453a;
+    }
+
+    .gray {
+      background: #636366;
+    }
+
+    .dark {
+      background: #48484a;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .grid button {
+      margin: 0;
+    }
+
+    /* POWER */
+
+    .power-value {
+      font-size: 38px;
+      font-weight: 800;
+      margin: 3px 0 12px;
+    }
+
+    .power-percent {
+      color: #ff9f0a;
+    }
+
+    .power-raw {
+      font-family: monospace;
+      color: #8e8e93;
+      font-size: 13px;
+      margin-top: -5px;
+      margin-bottom: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 42px;
+
+      margin: 4px 0 10px;
+
+      accent-color: #ff9500;
+      cursor: pointer;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      color: #8e8e93;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    /* DEVICE INFO */
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 7px 0;
+
+      border-bottom: 1px solid #3a3a3c;
+
+      font-size: 13px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #8e8e93;
+    }
+
+    .info-value {
+      font-family: monospace;
+      color: #ffffff;
+      max-width: 65%;
+      overflow-wrap: anywhere;
+    }
+
+    /* LOG */
+
+    #log {
+      text-align: left;
+
+      background: #000000;
+      color: #00ff66;
+
+      border-radius: 10px;
+
+      padding: 10px;
+
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+      font-size: 11px;
+      line-height: 1.45;
+
+      min-height: 150px;
+      max-height: 300px;
+
+      overflow-y: auto;
+
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+
+      margin-top: 8px;
+    }
+
+    .log-buttons button {
+      min-height: 42px;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .footer {
+      color: #636366;
+      font-size: 11px;
+      margin-top: 15px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 360px) {
+      h1 {
+        font-size: 21px;
+      }
+
+      button {
+        font-size: 15px;
+      }
+
+      .power-value {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Vibratissimo BLE</h1>
+  <div class="subtitle">Diagnostic & Motor Control</div>
+
+  <div id="status" class="status-disconnected">
+    НЕ ПІДКЛЮЧЕНО
+  </div>
+
+  <!-- CONNECTION -->
+
+  <div class="panel">
+
+    <div class="panel-title">Підключення</div>
+
+    <button
+      id="connectButton"
+      class="green"
+      onclick="connect()"
+    >
+      1. ПІДКЛЮЧИТИ КУЛЬКУ
+    </button>
+
+    <button
+      id="modeButton"
+      class="blue"
+      onclick="sendMode()"
+      disabled
+    >
+      2. MOTOR MODE — 03 00
+    </button>
+
+    <button
+      class="gray"
+      onclick="disconnect()"
+    >
+      ВІДКЛЮЧИТИ
+    </button>
+
+  </div>
+
+  <!-- DEVICE -->
+
+  <div class="panel">
+
+    <div class="panel-title">BLE пристрій</div>
+
+    <div class="info-row">
+      <span class="info-label">Назва</span>
+      <span id="deviceName" class="info-value">—</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">ID</span>
+      <span id="deviceId" class="info-value">—</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">GATT</span>
+      <span id="gattState" class="info-value">Disconnected</span>
+    </div>
+
+  </div>
+
+  <!-- POWER -->
+
+  <div class="panel">
+
+    <div class="panel-title">Потужність моторчика</div>
+
+    <div class="power-value">
+      <span id="powerValue" class="power-percent">0%</span>
+    </div>
+
+    <div id="rawValue" class="power-raw">
+      RAW: 0 — HEX: 00
+    </div>
+
+    <input
+      id="powerSlider"
+      type="range"
+      min="0"
+      max="100"
+      value="0"
+      step="1"
+      oninput="sliderChanged(this.value)"
+    >
+
+    <div class="range-labels">
+      <span>0%</span>
+      <span>25%</span>
+      <span>50%</span>
+      <span>75%</span>
+      <span>100%</span>
+    </div>
+
+    <div class="grid">
+
+      <button
+        class="orange"
+        onclick="setPower(10)"
+      >
+        10%
+      </button>
+
+      <button
+        class="orange"
+        onclick="setPower(25)"
+      >
+        25%
+      </button>
+
+      <button
+        class="orange"
+        onclick="setPower(50)"
+      >
+        50%
+      </button>
+
+      <button
+        class="orange"
+        onclick="setPower(100)"
+      >
+        100%
+      </button>
+
+    </div>
+
+    <button
+      class="red"
+      onclick="stopMotor()"
+    >
+      STOP — 00 00
+    </button>
+
+  </div>
+
+  <!-- DIAGNOSTICS -->
+
+  <div class="panel">
+
+    <div class="panel-title">BLE діагностика</div>
+
+    <div class="info-row">
+      <span class="info-label">Service</span>
+      <span class="info-value">1523</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">Mode characteristic</span>
+      <span class="info-value">1524</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">Motor characteristic</span>
+      <span class="info-value">1526</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">Остання потужність</span>
+      <span id="lastPower" class="info-value">—</span>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">Остання команда</span>
+      <span id="lastCommand" class="info-value">—</span>
+    </div>
+
+  </div>
+
+  <!-- LOG -->
+
+  <div class="panel">
+
+    <div class="panel-title">BLE Console</div>
+
+    <div id="log">Console ready...</div>
+
+    <div class="log-buttons">
+
+      <button
+        class="dark"
+        onclick="clearLog()"
+      >
+        ОЧИСТИТИ LOG
+      </button>
+
+      <button
+        class="dark"
+        onclick="copyLog()"
+      >
+        КОПІЮВАТИ LOG
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Vibratissimo BLE Diagnostic<br>
+    Web Bluetooth / GATT
+  </div>
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   BLE CONFIGURATION
+   ============================================================ */
+
+const SERVICE_UUID =
+  "00001523-1212-efde-1523-785feabcd123";
+
+const MODE_UUID =
+  "00001524-1212-efde-1523-785feabcd123";
+
+const MOTOR_UUID =
+  "00001526-1212-efde-1523-785feabcd123";
+
+
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+
+let device = null;
+let server = null;
+let service = null;
+
+let modeChar = null;
+let motorChar = null;
+
+let currentPower = 0;
+
+
+/* ============================================================
+   DOM HELPERS
+   ============================================================ */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+
+/* ============================================================
+   LOGGING
+   ============================================================ */
+
+function log(message) {
+
+  const el = $("log");
+
+  const now = new Date();
+
+  const time =
+    now.toLocaleTimeString(
+      "uk-UA",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }
+    );
+
+  el.textContent =
+    `[${time}] ${message}\n` +
+    el.textContent;
+}
+
+
+function clearLog() {
+
+  $("log").textContent =
+    "Console cleared...";
+}
+
+
+async function copyLog() {
+
+  try {
+
+    await navigator.clipboard.writeText(
+      $("log").textContent
+    );
+
+    log("LOG copied to clipboard");
+
+  } catch (err) {
+
+    log(
+      "Clipboard error: " +
+      err.message
+    );
+  }
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+function updateStatus(
+  text,
+  type = "disconnected"
+) {
+
+  const el = $("status");
+
+  el.textContent = text;
+
+  el.className = "";
+
+  el.classList.add(
+    type === "connected"
+      ? "status-connected"
+      : type === "searching"
+      ? "status-searching"
+      : type === "error"
+      ? "status-error"
+      : "status-disconnected"
+  );
+}
+
+
+/* ============================================================
+   BUTTON STATE
+   ============================================================ */
+
+function updateButtons() {
+
+  const connected =
+    !!(
+      device &&
+      device.gatt &&
+      device.gatt.connected
+    );
+
+  $("modeButton").disabled =
+    !connected || !modeChar;
+
+}
+
+
+/* ============================================================
+   HEX
+   ============================================================ */
+
+function byteToHex(value) {
+
+  return value
+    .toString(16)
+    .padStart(2, "0")
+    .toUpperCase();
+}
+
+
+function bytesToHex(bytes) {
+
+  return Array
+    .from(bytes)
+    .map(byteToHex)
+    .join(" ");
+}
+
+
+/* ============================================================
+   WRITE BLE
+   ============================================================ */
+
+async function writeBytes(
+  characteristic,
+  bytes,
+  charName
+) {
+
+  if (!characteristic) {
+
+    log(
+      `ERROR: ${charName} characteristic not ready`
+    );
+
+    return false;
+  }
+
+  const data =
+    new Uint8Array(bytes);
+
+  const hex =
+    bytesToHex(data);
+
+  try {
+
+    /*
+      Prefer Write Without Response.
+      This corresponds to the behaviour
+      that worked in the previous version.
+    */
+
+    if (
+      typeof characteristic.writeValueWithoutResponse ===
+      "function"
+    ) {
+
+      await characteristic.writeValueWithoutResponse(
+        data
+      );
+
+      log(
+        `TX NoResp ${charName}: [${hex}]`
+      );
+
+    } else {
+
+      await characteristic.writeValue(
+        data
+      );
+
+      log(
+        `TX WithResp ${charName}: [${hex}]`
+      );
+    }
+
+    $("lastCommand").textContent =
+      `${charName}: ${hex}`;
+
+    return true;
+
+  } catch (err) {
+
+    log(
+      `TX FAIL ${charName}: ${err.message}`
+    );
+
+    return false;
+  }
+}
+
+
+/* ============================================================
+   CONNECT
+   ============================================================ */
+
+async function connect() {
+
+  if (
+    !navigator.bluetooth
+  ) {
+
+    updateStatus(
+      "WEB BLUETOOTH НЕ ПІДТРИМУЄТЬСЯ",
+      "error"
+    );
+
+    log(
+      "ERROR: navigator.bluetooth unavailable"
+    );
+
+    return;
+  }
+
+  try {
+
+    updateStatus(
+      "ПОШУК BLE ПРИСТРОЮ...",
+      "searching"
+    );
+
+    log(
+      "Requesting BLE Device..."
+    );
+
+    device =
+      await navigator.bluetooth.requestDevice({
+
+        filters: [
+          {
+            services: [
+              SERVICE_UUID
+            ]
+          }
+        ],
+
+        optionalServices: [
+          SERVICE_UUID
+        ]
+
+      });
+
+
+    log(
+      `Device selected: ${
+        device.name || "Unnamed"
+      }`
+    );
+
+
+    $("deviceName").textContent =
+      device.name || "Unnamed";
+
+
+    $("deviceId").textContent =
+      device.id || "—";
+
+
+    device.addEventListener(
+      "gattserverdisconnected",
+      onDisconnected
+    );
+
+
+    updateStatus(
+      "ПІДКЛЮЧЕННЯ...",
+      "searching"
+    );
+
+
+    server =
+      await device.gatt.connect();
+
+
+    $("gattState").textContent =
+      "Connected";
+
+
+    log(
+      "GATT Connected"
+    );
+
+
+    service =
+      await server.getPrimaryService(
+        SERVICE_UUID
+      );
+
+
+    log(
+      "Service 1523 found"
+    );
+
+
+    modeChar =
+      await service.getCharacteristic(
+        MODE_UUID
+      );
+
+
+    log(
+      "Mode Characteristic 1524 found"
+    );
+
+
+    motorChar =
+      await service.getCharacteristic(
+        MOTOR_UUID
+      );
+
+
+    log(
+      "Motor Characteristic 1526 found"
+    );
+
+
+    updateStatus(
+      `ПІДКЛЮЧЕНО: ${
+        device.name || "Device"
+      }`,
+      "connected"
+    );
+
+
+    updateButtons();
+
+
+    log(
+      "READY FOR COMMANDS"
+    );
+
+
+  } catch (err) {
+
+    updateStatus(
+      "ПОМИЛКА ПІДКЛЮЧЕННЯ",
+      "error"
+    );
+
+    $("gattState").textContent =
+      "Error";
+
+    log(
+      `ERROR: ${err.message}`
+    );
+
+    updateButtons();
+  }
+}
+
+
+/* ============================================================
+   MOTOR MODE
+   ============================================================ */
+
+async function sendMode() {
+
+  if (!modeChar) {
+
+    log(
+      "ERROR: Mode characteristic unavailable"
+    );
+
+    return;
+  }
+
+
+  log(
+    "Sending Motor Mode init: 03 00"
+  );
+
+
+  await writeBytes(
+    modeChar,
+    [0x03, 0x00],
+    "1524"
+  );
+}
+
+
+/* ============================================================
+   POWER CONVERSION
+   ============================================================ */
+
+function percentToRaw(percent) {
+
+  return Math.round(
+    (percent * 255) / 100
+  );
+}
+
+
+/* ============================================================
+   SLIDER
+   ============================================================ */
+
+function sliderChanged(value) {
+
+  const percent =
+    parseInt(value, 10);
+
+  currentPower =
+    percent;
+
+  updatePowerDisplay(
+    percent
+  );
+}
+
+
+function updatePowerDisplay(
+  percent
+) {
+
+  const raw =
+    percentToRaw(percent);
+
+  const hex =
+    byteToHex(raw);
+
+
+  $("powerValue").textContent =
+    `${percent}%`;
+
+
+  $("rawValue").textContent =
+    `RAW: ${raw} — HEX: ${hex}`;
+
+
+  $("powerSlider").value =
+    percent;
+}
+
+
+/* ============================================================
+   SET POWER
+   ============================================================ */
+
+async function setPower(
+  percent
+) {
+
+  if (!motorChar) {
+
+    log(
+      "ERROR: Motor characteristic unavailable"
+    );
+
+    return;
+  }
+
+
+  percent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(percent)
+      )
+    );
+
+
+  currentPower =
+    percent;
+
+
+  updatePowerDisplay(
+    percent
+  );
+
+
+  const rawValue =
+    percentToRaw(
+      percent
+    );
+
+
+  const hex =
+    byteToHex(
+      rawValue
+    );
+
+
+  log(
+    `Setting Power ${percent}% → [${hex} 00]`
+  );
+
+
+  const success =
+    await writeBytes(
+      motorChar,
+      [
+        rawValue,
+        0x00
+      ],
+      "1526"
+    );
+
+
+  if (success) {
+
+    $("lastPower").textContent =
+      `${percent}% (${hex} 00)`;
+  }
+}
+
+
+/* ============================================================
+   STOP
+   ============================================================ */
+
+async function stopMotor() {
+
+  log(
+    "Sending STOP command: 00 00"
+  );
+
+
+  if (!motorChar) {
+
+    log(
+      "ERROR: Motor characteristic unavailable"
+    );
+
+    return;
+  }
+
+
+  const success =
+    await writeBytes(
+      motorChar,
+      [
+        0x00,
+        0x00
+      ],
+      "1526"
+    );
+
+
+  if (success) {
+
+    currentPower = 0;
+
+    updatePowerDisplay(
+      0
+    );
+
+    $("lastPower").textContent =
+      "STOP (00 00)";
+  }
+}
+
+
+/* ============================================================
+   DISCONNECT
+   ============================================================ */
+
+async function disconnect() {
+
+  try {
+
+    if (
+      device &&
+      device.gatt &&
+      device.gatt.connected
+    ) {
+
+      log(
+        "Sending STOP before disconnect..."
+      );
+
+      if (motorChar) {
+
+        await writeBytes(
+          motorChar,
+          [
+            0x00,
+            0x00
+          ],
+          "1526"
+        );
+      }
+
+
+      device.gatt.disconnect();
+
+    } else {
+
+      log(
+        "No active GATT connection"
+      );
+    }
+
+  } catch (err) {
+
+    log(
+      `Disconnect error: ${err.message}`
+    );
+  }
+}
+
+
+/* ============================================================
+   DISCONNECTED EVENT
+   ============================================================ */
+
+function onDisconnected() {
+
+  updateStatus(
+    "ВІДКЛЮЧЕНО",
+    "disconnected"
+  );
+
+
+  $("gattState").textContent =
+    "Disconnected";
+
+
+  log(
+    "Device disconnected"
+  );
+
+
+  modeChar = null;
+  motorChar = null;
+  server = null;
+  service = null;
+
+
+  updateButtons();
+}
+
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+
+updatePowerDisplay(
+  0
+);
+
+updateButtons();
+
+
+if (!navigator.bluetooth) {
+
+  log(
+    "WARNING: Web Bluetooth API unavailable"
+  );
+
+} else {
+
+  log(
+    "Web Bluetooth API available"
+  );
+}
+
+</script>
+
+</body>
+</html>
